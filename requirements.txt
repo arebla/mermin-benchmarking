@@ -1,0 +1,15 @@
+numpy==1.26.4
+pandas==2.2.2
+qiskit==1.4.0
+qiskit-addon-obp==0.1.0
+qiskit-addon-sqd==0.8.1
+qiskit-addon-utils==0.1.0
+qiskit-aer==0.15.1
+qiskit-ibm-catalog==0.2.0
+qiskit-ibm-provider==0.11.0
+qiskit-ibm-runtime==0.33.2
+qiskit-ibm-transpiler==0.9.0
+qiskit-qasm3-import==0.4.2
+qiskit-serverless==0.18.0
+qiskit-transpiler-service==0.4.3
+rustworkx==0.15.1
