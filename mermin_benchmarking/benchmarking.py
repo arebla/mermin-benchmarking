@@ -43,6 +43,7 @@ def estimator_value(terms: List[str], coeffs: List[float]) -> float:
     
     return exps
 
+
 def get_metrics(circuits, backend=None, physical_qubits=[]):
     fidelity = 1
     if isinstance(circuits, list):
@@ -55,9 +56,16 @@ def get_metrics(circuits, backend=None, physical_qubits=[]):
     if backend:
         circuits = transpile(circuits, backend, optimization_level=0, initial_layout=physical_qubits, seed_transpiler=SEED)
         for op in range(len(backend.operations)):
-            if backend.operations[op].name in ['cz', 'cx', 'cy']:
+            if backend.operations[op].name in ['cz', 'cx', 'cy', 'ecr']:
                 control_op = backend.operations[op].name
-        unique_edges = {tuple(sorted(edge)) for edge in backend.target[control_op]}
+
+        # Some backends report the CNOT error for both directions of the edge, which can lead to inconsistencies.
+        # If the number of entries exceeds a certain threshold we use a set with sorted tuples to ensure uniqueness.
+        if len(backend.target[control_op].keys()) > backend.num_qubits*2:
+            unique_edges = {tuple(sorted(edge)) for edge in backend.target[control_op]}
+        else:
+            unique_edges = backend.target[control_op].keys()
+        
         fidelity *= np.prod([1 - backend.target[control_op][edge].error for edge in unique_edges if set(edge).issubset(physical_qubits)])
         fidelity *= np.prod([1 - backend.target['measure'][(q,)].error for q in physical_qubits])
 

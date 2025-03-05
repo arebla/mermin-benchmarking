@@ -5,8 +5,8 @@ SEED = 999
 from qiskit import QuantumCircuit, transpile
 from qiskit.providers.backend import Backend
 from qiskit_aer import AerSimulator
+from qiskit.primitives.containers.primitive_result import PrimitiveResult
 from qiskit_ibm_runtime import (
-    QiskitRuntimeService, 
     SamplerV2 as Sampler,
     SamplerOptions
 )
@@ -90,7 +90,7 @@ def run_static(circuits: List[QuantumCircuit], shots: int = 1024, backend: Optio
     Args:
         num_qubits (int): Number of qubits.
         circuits (List[QuantumCircuit]): Quantum circuits to execute.
-        shots (int): Number of shots (measurement repetitions) to perform.
+        shots (int): Number of shots (measurement repetitions) to perform per circuit.
         coeffs (List[int]): Coefficients corresponding to each Mermin term for computing M_values.
         backend (Optional[Backend], optional): Backend object for execution. Default is None (uses Aer simulator).
         readout_matrix (Optional[np.ndarray], optional): Readout error mitigation matrix. Default is None.
@@ -99,7 +99,7 @@ def run_static(circuits: List[QuantumCircuit], shots: int = 1024, backend: Optio
     
     Returns:
         float: Computed observable value.
-
+        
     """
     num_qubits = circuits[0].num_qubits
     coeffs = mermin_terms(num_qubits)[1]
@@ -137,6 +137,44 @@ def run_static(circuits: List[QuantumCircuit], shots: int = 1024, backend: Optio
     for row in range(len(circuits)):
         M_values += sum(df.iloc[row]*coeffs[row]) / shots
 
+    return M_values
+
+def counts2staticvalue(job_result: PrimitiveResult, readout_matrix: Optional[np.ndarray] = None):
+    """
+    Computes an observable value from the result of a primitive job for a static experiment.
+
+    Args:
+        job_result (PrimitiveResult): The result object containing the outcome of the primitive job execution.
+        readout_matrix (Optional[np.ndarray], optional): Readout error mitigation matrix. Default is None.
+
+    Returns:
+        float: Computed observable value.
+        
+    """
+    M_values = 0
+    
+    num_circuits = len(job_result)
+    num_qubits = job_result[0].data.c.num_bits
+    shots = job_result[0].data.c.num_shots
+    coeffs = mermin_terms(num_qubits)[1]
+    bitstrings = [bin(i)[2:].zfill(num_qubits) for i in range(2**num_qubits)]
+    counts = [job_result[i].data.c.get_counts() for i in range(num_circuits)]
+    
+    df = pd.DataFrame(counts, columns=bitstrings).fillna(0)
+    
+    if readout_matrix is not None:
+        results_matrix = df.to_numpy()
+        results_matrix = corrected_counts(results_matrix, readout_matrix)
+        df = pd.DataFrame(results_matrix, columns=df.columns)   
+        
+        # Apply correction based on parity of '1's in bitstring columns
+    for i in range(len(df.columns)):
+        if df.columns[i].count('1') % 2 == 1:
+            df[df.columns[i]] = df[df.columns[i]].apply(lambda x: x*(-1))
+    
+    for row in range(num_circuits):
+        M_values += sum(df.iloc[row]*coeffs[row]) / shots
+        
     return M_values
 
 
@@ -181,6 +219,45 @@ def run_dynamic(circuit: QuantumCircuit, shots: int, backend: Optional[Backend] 
         results_matrix = df.to_numpy()
         results_matrix = corrected_counts(results_matrix, readout_matrix)
 #        results_matrix = np.transpose(np.dot(readout_matrix, np.transpose(results_matrix)))
+        df = pd.DataFrame(results_matrix, columns=df.columns)
+    
+    binary_terms = [term.replace('X', '0').replace('Y', '1') for term in terms]
+    
+    for i in range(len(terms)):
+        columns_to_modify = df.columns[df.columns.str.contains(fr'^{binary_terms[i]}\d+$')]
+        df[columns_to_modify] = df[columns_to_modify].apply(lambda x: x*(-1) if x.name[len(binary_terms[i]):].count('1') % 2 == 1 else x)
+        df[columns_to_modify] = df[columns_to_modify].apply(lambda x: x*coeffs[i])
+    
+    M_values = df.iloc[0].sum() / (shots / 2**(num_qubits - 1))
+    
+    return M_values
+
+def counts2dynamicvalue(job_result: PrimitiveResult, readout_matrix: Optional[np.ndarray] = None):
+    """
+    Computes an observable value from the result of a primitive job for a dynamic experiment.
+
+    Args:
+        job_result (PrimitiveResult): The result object containing the outcome of the primitive job execution.
+        readout_matrix (Optional[np.ndarray], optional): Readout error mitigation matrix. Default is None.
+
+    Returns:
+        float: Computed observable value.
+        
+    """
+    M_values = 0
+    
+    num_circuits = len(job_result)
+    num_qubits = int(job_result[0].data.c.num_bits/2)
+    terms, coeffs = mermin_terms(num_qubits)
+    shots = job_result[0].data.c.num_shots
+    bitstrings = [bin(i)[2:].zfill(num_qubits*2) for i in range(2**(num_qubits*2))]
+    counts = result[0].data.c.get_counts()
+    
+    df = pd.DataFrame(counts, index=[0], columns=bitstrings).fillna(0)
+    
+    if readout_matrix is not None:
+        results_matrix = df.to_numpy()
+        results_matrix = corrected_counts(results_matrix, readout_matrix)
         df = pd.DataFrame(results_matrix, columns=df.columns)
     
     binary_terms = [term.replace('X', '0').replace('Y', '1') for term in terms]

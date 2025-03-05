@@ -1,11 +1,18 @@
 from typing import List, Tuple, Optional, Union
 
 import numpy as np
+from scipy.optimize import minimize
 import pandas as pd
+pd.set_option('future.no_silent_downcasting', True)
 import matplotlib.pyplot as plt
+
 from qiskit import QuantumCircuit, transpile
 from qiskit.providers.backend import Backend
-from scipy.optimize import minimize
+from qiskit_ibm_runtime import (
+    SamplerV2 as Sampler,
+    SamplerOptions
+)
+
 from .circuit_generation import bitstring2circuit
 
 
@@ -23,6 +30,8 @@ def correlated_readout_error_matrix(physical_qubits: List[int], backend: Backend
     """
     if backend is None:
         return None
+        
+    sampler = Sampler(mode=backend)
     
     shots = 1024*2**len(physical_qubits)
     aux_circuits = []
@@ -34,8 +43,9 @@ def correlated_readout_error_matrix(physical_qubits: List[int], backend: Backend
         aux_circuits.append(bitstring2circuit(bitstring))
         
     transpiled_circuits = transpile(aux_circuits, backend, optimization_level=0, initial_layout=physical_qubits)
-    counts = backend.run(transpiled_circuits, shots=shots).result().get_counts()
-    
+    result = sampler.run(transpiled_circuits, shots=shots).result()
+    counts = [result[i].data.meas.get_counts() for i in range(len(aux_circuits))]
+        
     df = pd.DataFrame(counts, columns=bitstrings).fillna(0) / shots
     assignment_matrix = np.transpose(df.to_numpy())   
     mitigation_matrix = np.linalg.inv(assignment_matrix)

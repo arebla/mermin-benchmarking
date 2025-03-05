@@ -26,6 +26,7 @@ from .measurement import(
     run_static,
     run_dynamic,
     MerminExperiment,
+    counts2staticvalue,
 )
 
 from .benchmarking import(

@@ -39,11 +39,17 @@ def find_best_subgraph(subgraphs: List[Tuple[int]], backend: Backend) -> Tuple[i
 
     # Search through backend operations to find the control operation
     for op in range(len(backend.operations)):
-        if backend.operations[op].name in ['cz', 'cx', 'cy']:
+        if backend.operations[op].name in ['cz', 'cx', 'cy', 'ecr']:
             control_op = backend.operations[op].name
 
     # Extract unique edges for the control operation error
-    unique_edges = {tuple(sorted(edge)) for edge in backend.target[control_op]}
+    # Some backends report the CNOT error for both directions of the edge, which can lead to inconsistencies.
+    # If the number of entries exceeds a certain threshold we use a set with sorted tuples to ensure uniqueness.
+    if len(backend.target[control_op].keys()) > backend.num_qubits*2:
+        unique_edges = {tuple(sorted(edge)) for edge in backend.target[control_op]}
+    else:
+        unique_edges = backend.target[control_op].keys()
+
     
     for subgraph_nodes in subgraphs:
         # Measure error contribution to score
@@ -58,18 +64,6 @@ def find_best_subgraph(subgraphs: List[Tuple[int]], backend: Backend) -> Tuple[i
     
     max_score_index = np.argmax(fidelity_scores)
     best_subgraph_nodes = subgraphs[max_score_index]
-
-#    # Find the second best subgraph
-#    G.remove_nodes_from(best_subgraph_nodes)
-#
-#    subgraphs = find_connected_subgraphs(G, size)
-#    fidelity_scores = []
-#    for subgraph_nodes in subgraphs:
-#        score = np.prod([1 - backend.target['measure'][(node,)].error for node in subgraph_nodes])
-#        fidelity_scores.append(score)
-#    
-#    max_score_index = np.argmax(fidelity_scores)
-#    second_best_subgraph_nodes = subgraphs[max_score_index]
 
     return best_subgraph_nodes
 
@@ -106,6 +100,7 @@ def get_physical_qubits(num_qubits: int, backend: Optional[Backend] = None) -> L
 
     return physical_qubits
 
+
 def get_aux_physical_qubits(num_qubits: int, backend: Optional[Backend] = None, physical_qubits: List[int] = []) -> List[int]:
     """
     Retrieves a physical layout of qubits on the given backend that optimizes connectivity.
@@ -140,7 +135,6 @@ def get_aux_physical_qubits(num_qubits: int, backend: Optional[Backend] = None, 
     aux_physical_qubits = sorted(list(best_subgraph))
 
     return aux_physical_qubits
-
 
 
 def BFS_GHZ(num_qubits: int, backend: Backend, physical_qubits: List[int]) -> QuantumCircuit:

@@ -1,0 +1,4 @@
+mermin_benchmarking/__pycache__/
+mermin_benchmarking/.ipynb_checkpoints/
+*.pyc
+**/.ipynb_checkpoints/
