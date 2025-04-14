@@ -58,7 +58,7 @@ class MerminExperiment:
         if self.mode == 'static':
             return run_static(self.circuits, self.shots,
                               self.backend, readout_matrix=self.readout_error_matrix, 
-                              physical_qubits=self.physical_qubits, sampler_options=self.sampler_options)
+                              physical_qubits=self.physical_qubits, symmetries=self.symmetries, sampler_options=self.sampler_options)
         elif self.mode == 'dynamic':
             return run_dynamic(self.circuits, self.shots, 
                                self.backend, readout_matrix=self.readout_error_matrix, 
@@ -82,8 +82,7 @@ class MerminExperiment:
 
 
 def run_static(circuits: List[QuantumCircuit], shots: int = 1024, backend: Optional[Backend] = None,
-               readout_matrix: Optional[np.ndarray] = None, physical_qubits: Optional[List[int]] = None, 
-               sampler_options: Optional[Union[Dict, SamplerOptions]] = None) -> float:
+               readout_matrix: Optional[np.ndarray] = None, physical_qubits: Optional[List[int]] = None, symmetries: bool = False, sampler_options: Optional[Union[Dict, SamplerOptions]] = None) -> float:
     """
     Executes static quantum circuits and computes an observable value.
 
@@ -95,6 +94,7 @@ def run_static(circuits: List[QuantumCircuit], shots: int = 1024, backend: Optio
         backend (Optional[Backend], optional): Backend object for execution. Default is None (uses Aer simulator).
         readout_matrix (Optional[np.ndarray], optional): Readout error mitigation matrix. Default is None.
         physical_qubits (Optional[List[int]], optional): List of physical qubits for initial layout. Required if backend is provided.
+        symmetries (bool, optional): Whether to use the simplified circuits or not.
         sampler_options (Optional[Union[Dict, SamplerOptions]], optional): Sampler primitive options to use. Default is None.
     
     Returns:
@@ -102,7 +102,10 @@ def run_static(circuits: List[QuantumCircuit], shots: int = 1024, backend: Optio
         
     """
     num_qubits = circuits[0].num_qubits
-    coeffs = mermin_terms(num_qubits)[1]
+    if symmetries:
+        coeffs = simplified_mermin_terms(num_qubits)[1]
+    else:
+        coeffs = mermin_terms(num_qubits)[1] 
     
     M_values = 0
     bitstrings = [bin(i)[2:].zfill(num_qubits) for i in range(2**num_qubits)]
@@ -139,12 +142,13 @@ def run_static(circuits: List[QuantumCircuit], shots: int = 1024, backend: Optio
 
     return M_values
 
-def counts2staticvalue(job_result: PrimitiveResult, readout_matrix: Optional[np.ndarray] = None):
+def counts2staticvalue(job_result: PrimitiveResult, symmetries: bool = False, readout_matrix: Optional[np.ndarray] = None):
     """
     Computes an observable value from the result of a primitive job for a static experiment.
 
     Args:
         job_result (PrimitiveResult): The result object containing the outcome of the primitive job execution.
+        symmetries (bool, optional): Whether simplified circuits were used or not.
         readout_matrix (Optional[np.ndarray], optional): Readout error mitigation matrix. Default is None.
 
     Returns:
@@ -156,7 +160,10 @@ def counts2staticvalue(job_result: PrimitiveResult, readout_matrix: Optional[np.
     num_circuits = len(job_result)
     num_qubits = job_result[0].data.c.num_bits
     shots = job_result[0].data.c.num_shots
-    coeffs = mermin_terms(num_qubits)[1]
+    if symmetries:
+        coeffs = simplified_mermin_terms(num_qubits)[1]
+    else:
+        coeffs = mermin_terms(num_qubits)[1] 
     bitstrings = [bin(i)[2:].zfill(num_qubits) for i in range(2**num_qubits)]
     counts = [job_result[i].data.c.get_counts() for i in range(num_circuits)]
     
@@ -208,7 +215,7 @@ def run_dynamic(circuit: QuantumCircuit, shots: int, backend: Optional[Backend] 
     else:
         aer_sim = AerSimulator()
         sampler = Sampler(mode=aer_sim)
-            
+
     result = sampler.run([circuit], shots=shots).result()
     counts = result[0].data.c.get_counts()
 
@@ -251,7 +258,7 @@ def counts2dynamicvalue(job_result: PrimitiveResult, readout_matrix: Optional[np
     terms, coeffs = mermin_terms(num_qubits)
     shots = job_result[0].data.c.num_shots
     bitstrings = [bin(i)[2:].zfill(num_qubits*2) for i in range(2**(num_qubits*2))]
-    counts = result[0].data.c.get_counts()
+    counts = job_result[0].data.c.get_counts()
     
     df = pd.DataFrame(counts, index=[0], columns=bitstrings).fillna(0)
     

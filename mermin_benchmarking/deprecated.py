@@ -11,7 +11,7 @@ from rustworkx import PyGraph
 from rustworkx.visit import BFSVisitor
 from qiskit import QuantumCircuit, transpile
 from qiskit.providers.backend import Backend
-from .ghz_optimization import TreeEdgesRecorder
+
 
 def required_memory(qpu_size, subgraph_size):
     """
@@ -35,6 +35,20 @@ def required_memory(qpu_size, subgraph_size):
 
     return total_mem
 
+
+class TreeEdgesRecorder(BFSVisitor):
+    def __init__(self, max_size=None):
+        self.edges = []
+        self.nodes = set()
+        self.max_size = max_size
+
+    def tree_edge(self, edge):
+        self.edges.append(edge)
+
+    def discover_vertex(self, v):
+        if self.max_size is None or len(self.nodes) < self.max_size:
+            self.nodes.add(v)
+        return self.max_size is None or len(self.nodes) < self.max_size
 
 def find_connected_subgraphs(G: PyGraph, size: int, iterations: int = 10**3) -> List[Tuple[int]]:
     """

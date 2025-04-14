@@ -1,6 +1,7 @@
 from typing import List, Tuple, Optional, Union
 
 import numpy as np
+import random
 import rustworkx as rx
 from rustworkx import PyGraph
 from rustworkx.visit import BFSVisitor
@@ -93,7 +94,23 @@ def get_physical_qubits(num_qubits: int, backend: Optional[Backend] = None) -> L
     for edge in coupling_map_edges:
         G.add_edge(edge[0], edge[1], None)
 
-    subgraphs = rx.connected_subgraphs(G, num_qubits)
+    if num_qubits > 17: # Change if more than ~20 GB of RAM
+        subgraphs = set()
+        iterations = 10**3
+        
+        for _ in range(iterations):
+            start_node = random.choice(G.nodes())
+        
+            vis = TreeEdgesRecorder(num_qubits)
+            rx.bfs_search(G, [start_node], vis)
+        
+            nodes = tuple(sorted(vis.nodes))
+            subgraphs.add(nodes)
+        subgraphs = list(subgraphs)
+
+    else:
+        subgraphs = rx.connected_subgraphs(G, num_qubits)
+        
     best_subgraph = find_best_subgraph(subgraphs, backend)
     
     physical_qubits = sorted(list(best_subgraph))

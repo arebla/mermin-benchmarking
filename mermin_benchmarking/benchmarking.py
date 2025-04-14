@@ -1,8 +1,10 @@
 from typing import List, Tuple, Optional, Union
 
 import numpy as np
-from qiskit import transpile
 import matplotlib.pyplot as plt
+
+from qiskit import transpile
+from .ghz_optimization import GHZ_state, W_state
 
 SEED = 999
 
