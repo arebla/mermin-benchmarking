@@ -2,8 +2,12 @@ from typing import List, Tuple, Optional, Union
 import os
 import json
 from collections import defaultdict
+import csv
+from datetime import datetime
+
 
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from qiskit import QuantumCircuit
@@ -202,3 +206,80 @@ def generate_job_files(job_id: str, service: QiskitRuntimeService):
     with open(file_name_details, 'w') as f:
         for line in job_details:
             f.write(line + '\n')
+
+
+# Save calibration data from IBM Quantum devices
+# Heavily inspired by https://quantumcomputing.stackexchange.com/questions/40011/how-to-download-historical-calibration-data-from-ibm-quantum-devices
+
+def save_calibration_to_csv(backend, date):
+    """
+    
+    Args:
+
+    Returns:
+
+    """
+    properties = backend.properties(datetime=date)
+    
+    date_str = date.strftime('%Y%m%d%H%M%S')
+    filename = f"./data/backend_calibrations/{backend.name}-calibrations-{date_str}.csv"
+    
+    fieldnames = [
+        "Qubit", "T1 (us)", "T2 (us)", "Frequency (GHz)", "Anharmonicity (GHz)",
+        "Readout assignment error ", "Prob meas0 prep1 ", "Prob meas1 prep0 ",
+        "Readout length (ns)", "ID error ", "Z-axis rotation (rz) error ",
+        "√x (sx) error ", "Pauli-X error ", "ECR error ", "Gate time (ns)", "Operational"
+    ]
+    
+    with open(filename, "w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+        writer.writeheader()
+    
+        for idx, qubit in enumerate(properties.qubits):
+            id_error = rz_error = sx_error = x_error = ecr_error = gate_time = ""
+    
+            for op in backend.operation_names:
+                if op == "id":
+                    id_error = backend.target['id'][(idx,)].error
+                elif op == "rz":
+                    rz_error = backend.target['rz'][(idx,)].error
+                elif op == "sx":
+                    sx_error = backend.target['sx'][(idx,)].error
+                elif op == "x":
+                    x_error = backend.target['x'][(idx,)].error
+                elif op == "ecr":
+                    ecr_error_list = []
+                    gate_time_list = []
+                    
+                    for (q1, q2), instr_props in backend.target["ecr"].items():
+                        if q1 == idx:
+                            ecr_error_list.append(f"{q1}_{q2}:{instr_props.error}")
+                            gate_time_list.append(f"{q1}_{q2}:{int(instr_props.duration * 1e9)}")  # ns
+            
+
+            def get_qubit_prop(qubit, name):
+                for prop in qubit:
+                    if prop.name == name:
+                        return prop.value
+                return ""
+            
+            writer.writerow({
+                "Qubit": idx,
+                "T1 (us)": get_qubit_prop(qubit, 'T1'),
+                "T2 (us)": get_qubit_prop(qubit, 'T2'),
+                "Frequency (GHz)": get_qubit_prop(qubit, 'frequency'),
+                "Anharmonicity (GHz)": get_qubit_prop(qubit, 'anharmonicity'),
+                "Readout assignment error ": get_qubit_prop(qubit, 'readout_error'),
+                "Prob meas0 prep1 ": get_qubit_prop(qubit, 'prob_meas0_prep1'),
+                "Prob meas1 prep0 ": get_qubit_prop(qubit, 'prob_meas1_prep0'),
+                "Readout length (ns)": get_qubit_prop(qubit, 'readout_length'),
+                "ID error ": id_error,
+                "Z-axis rotation (rz) error ": rz_error,
+                "√x (sx) error ": sx_error,
+                "Pauli-X error ": x_error,
+                "ECR error ": ";".join(ecr_error_list),
+                "Gate time (ns)": ";".join(gate_time_list),
+                "Operational": "true"
+            })
+
+    print(f"Data successfully saved to {filename}")
