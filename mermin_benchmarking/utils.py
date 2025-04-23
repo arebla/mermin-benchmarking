@@ -5,17 +5,18 @@ from collections import defaultdict
 import csv
 from datetime import datetime
 
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from qiskit import QuantumCircuit
-from qiskit_ibm_runtime import RuntimeEncoder, RuntimeDecoder, QiskitRuntimeService
+from qiskit_ibm_runtime import RuntimeEncoder, RuntimeDecoder, QiskitRuntimeService, IBMBackend
+from qiskit_ibm_runtime.fake_provider.fake_backend import FakeBackendV2
 
 from .circuit_generation import mermin_terms, simplified_mermin_terms
 from .benchmarking import get_metrics
 from .measurement import counts2staticvalue, counts2dynamicvalue
+
 
 def matrix_representation(matrix: np.ndarray):
     """
@@ -27,6 +28,7 @@ def matrix_representation(matrix: np.ndarray):
     Returns:
         None: Displays a heatmap.
     """
+    
     n = int(np.log2(len(matrix)))
     #matrix = correlated_readout_error_matrix(physical_qubits, backend)
     
@@ -46,6 +48,7 @@ def matrix_representation(matrix: np.ndarray):
     plt.ylabel('Measured state', fontsize=14)
     plt.show()
 
+    
 def draw_circuits(circuits: Union[QuantumCircuit, List[QuantumCircuit]], terms: Optional[List[str]] = None, scale: Optional[float] = None):
     """
     Draws one or more quantum circuits with optional labels.
@@ -97,16 +100,19 @@ def draw_circuits(circuits: Union[QuantumCircuit, List[QuantumCircuit]], terms: 
     plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05, wspace=0, hspace=0)
     plt.show()
 
+
 def load_files(directory: str):
     """
-    Given a directory with files named in the format "backend-experiment_type-num_qubits-timestamp", returns a nested dictionary of Mermin values organized by backend, experiment type, and number of qubits.
+    Given a directory with files named in the format "backend-experiment_type-num_qubits-timestamp.json", 
+    returns a nested dictionary of Mermin values organized by backend, experiment type, and number of qubits.
 
     Args:
         directory (str): Path of the folder where the .json files are stored.
+        
     Returns:
         collections.defaultdict: Dictionary with the Mermin values by backend, experiment and number of qubits.
-    
     """
+    
     data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
 
     for file_name in os.listdir(directory):
@@ -144,14 +150,18 @@ def load_files(directory: str):
 
     return data
 
+
 def generate_job_files(job_id: str, service: QiskitRuntimeService):
     """
-    Given a IBM Quantum job id yields two files: a .json with counts data and a .txt with information about the job.
+    Generate two files for a given IBM Quantum job: a JSON file with result counts 
+    and a text file with job metadata.
 
     Args:
         job_id (str): The IBM Quantum job ID.
+        service (QiskitRuntimeService): The Qiskit service instance used to retrieve the job.
+        
     Returns: 
-        None: Saves the corresponding files in the ./data/ folder. 
+        None: Saves the resulting files in the "./data/" folder. 
     """
     
     job = service.job(job_id)
@@ -210,15 +220,24 @@ def generate_job_files(job_id: str, service: QiskitRuntimeService):
 
 # Save calibration data from IBM Quantum devices
 # Heavily inspired by https://quantumcomputing.stackexchange.com/questions/40011/how-to-download-historical-calibration-data-from-ibm-quantum-devices
-
-def save_calibration_to_csv(backend, date):
+def save_calibration_to_csv(backend: IBMBackend, date: datetime):
     """
+    Save the calibration data of an IBM backend at a specified date to a CSV file.
     
     Args:
+        backend (IBMBackend): The IBM Quantum backend to extract calibrations from.
+        date (datetime): A datetime object representing the desired calibration date.
 
     Returns:
+        None: Writes a .CSV file to the "./data/backend_calibrations/" directory.
 
+    Notes: 
+        - This function is hardcoded to work with 'Eagle r3' processor types.
+        - The CSV structure is designed to be compatible with the `refresh_backend_from_csv`
+          function and follows the same format as the calibrations provided by the 
+          IBM Quantum platform.
     """
+    
     properties = backend.properties(datetime=date)
     
     date_str = date.strftime('%Y%m%d%H%M%S')
@@ -283,3 +302,88 @@ def save_calibration_to_csv(backend, date):
             })
 
     print(f"Data successfully saved to {filename}")
+
+
+# Adapted from: https://egrettathula.wordpress.com/2023/01/10/refreshable-fake-backends/
+def refresh_backend_from_csv(self, calibrations_csv: str):
+    """
+    Load calibration data from a CSV file into the FakeBackendV2 backend.
+
+    Args:
+        calibrations_csv (str): Path to the CSV file containing calibration data.
+
+    Returns:
+        None
+
+    Usage:
+    ```
+    from qiskit_ibm_runtime.fake_provider import FakeBrisbane
+    backend = FakeBrisbane()
+
+    backend.refresh_from_csv(calibrations_csv)
+    ```
+    
+    Notes: 
+        - These `prop_names`, `gate_names` and row format may need to be adjusted 
+          to load calibrations from processor types other than 'Eagle r3'.
+        - This function does not update the calibration date.
+    """
+    
+    if self._props_dict is None:
+        self._set_props_dict_from_json()
+ 
+    prop_names = ['T1', 'T2', 'frequency', 'anharmonicity', 'readout_error', 
+                  'prob_meas0_prep1', 'prob_meas1_prep0', 'readout_length']
+    gate_names = ['id', 'rz', 'sx', 'x']
+
+    # Change calibration date if needed
+    #self._props_dict['last_update_date'] = datetime.utcnow().isoformat() + 'Z'
+    
+    import csv
+    with open(calibrations_csv) as csvfile:
+        reader = csv.reader(csvfile)
+        for idx, row in enumerate(reader):
+            if idx == 0:
+                continue
+            index = int(row[0])
+
+            # Set the `prop_names` errors
+            for node in self._props_dict['qubits'][index]:
+                for prop_index, prop_name in enumerate(prop_names):
+                    if node['name'] == prop_name:
+                        node['value'] = float(row[prop_index + 1])
+ 
+            # Single-qubit gate errors
+            for node in self._props_dict['gates']:
+                if node['qubits'] == [index]:
+                    for gate_index, gate_name in enumerate(gate_names):
+                        if node['gate'] == gate_name:
+                            for param in node['parameters']:
+                                if param['name'] == 'gate_error':
+                                    param['value'] = float(row[gate_index + 9])
+ 
+            # CNOT error
+            for s in row[13].split(';'):
+                if ':' not in s:
+                    continue
+                key, val = s.strip().split(':')
+                idxs = key.split('_')
+                for node in self._props_dict['gates']:
+                    if node['qubits'] == [int(idxs[0]), int(idxs[1])] and node['gate'] == 'ecr':
+                        for param in node['parameters']:
+                                if param['name'] == 'gate_error':
+                                    param['value'] = float(val)
+ 
+            # CNOT gate time
+            for s in row[14].split(';'):
+                if ':' not in s:
+                    continue
+                key, val = s.strip().split(':')
+                idxs = key.split('_')
+                for node in self._props_dict['gates']:
+                    if node['qubits'] == [int(idxs[0]), int(idxs[1])] and node['gate'] == 'ecr':
+                        for param in node['parameters']:
+                                if param['name'] == 'gate_length':
+                                    param['value'] = float(val)
+ 
+setattr(FakeBackendV2, 'refresh_from_csv', refresh_backend_from_csv) 

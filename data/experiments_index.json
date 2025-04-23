@@ -1,0 +1,805 @@
+{
+    "ibm_sherbrooke": {
+        "ibm_sherbrooke-calibrations-2025040502.csv": {
+            "4": {
+                "physical_qubits": [
+                    68,
+                    69,
+                    70,
+                    74
+                ],
+                "files": [
+                    "ibm_sherbrooke-static-4q-20250405030228.json",
+                    "ibm_sherbrooke-static-4q-20250405030802.json",
+                    "ibm_sherbrooke-static-4q-20250405030853.json"
+                ]
+            },
+            "3": {
+                "physical_qubits": [
+                    69,
+                    70,
+                    74
+                ],
+                "files": [
+                    "ibm_sherbrooke-static-3q-20250405030148.json",
+                    "ibm_sherbrooke-static-3q-20250405030629.json",
+                    "ibm_sherbrooke-static-3q-20250405030729.json"
+                ]
+            },
+            "5": {
+                "physical_qubits": [
+                    67,
+                    68,
+                    69,
+                    70,
+                    74
+                ],
+                "files": [
+                    "ibm_sherbrooke-static-5q-20250405030252.json",
+                    "ibm_sherbrooke-static-5q-20250405030933.json",
+                    "ibm_sherbrooke-static-5q-20250405031005.json"
+                ]
+            }
+        },
+        "ibm_sherbrooke-calibrations-2025041201.csv": {
+            "9": {
+                "physical_qubits": [
+                    68,
+                    69,
+                    70,
+                    74,
+                    86,
+                    87,
+                    88,
+                    89,
+                    93
+                ],
+                "files": [
+                    "ibm_sherbrooke-static_sym-9q-20250412012718.json",
+                    "ibm_sherbrooke-static_sym-9q-20250412013122.json",
+                    "ibm_sherbrooke-static_sym-9q-20250412013312.json"
+                ]
+            },
+            "12": {
+                "physical_qubits": [
+                    36,
+                    47,
+                    48,
+                    49,
+                    50,
+                    51,
+                    55,
+                    67,
+                    68,
+                    69,
+                    70,
+                    74
+                ],
+                "files": [
+                    "ibm_sherbrooke-static_sym-12q-20250412015746.json",
+                    "ibm_sherbrooke-static_sym-12q-20250412020006.json",
+                    "ibm_sherbrooke-static_sym-12q-20250412020200.json"
+                ]
+            },
+            "15": {
+                "physical_qubits": [
+                    36,
+                    49,
+                    50,
+                    51,
+                    55,
+                    67,
+                    68,
+                    69,
+                    70,
+                    74,
+                    86,
+                    87,
+                    88,
+                    89,
+                    93
+                ],
+                "files": [
+                    "ibm_sherbrooke-static_sym-15q-20250412021344.json",
+                    "ibm_sherbrooke-static_sym-15q-20250412021451.json",
+                    "ibm_sherbrooke-static_sym-15q-20250412022713.json"
+                ]
+            }
+        },
+        "ibm_sherbrooke-calibrations-2025041211.csv": {
+            "24": {
+                "physical_qubits": [
+                    83,
+                    86,
+                    87,
+                    88,
+                    89,
+                    92,
+                    93,
+                    100,
+                    101,
+                    102,
+                    103,
+                    104,
+                    105,
+                    106,
+                    107,
+                    108,
+                    111,
+                    112,
+                    120,
+                    121,
+                    122,
+                    123,
+                    124,
+                    126
+                ],
+                "files": [
+                    "ibm_sherbrooke-static_sym-24q-20250412182046.json",
+                    "ibm_sherbrooke-static_sym-24q-20250412182944.json",
+                    "ibm_sherbrooke-static_sym-24q-20250412183041.json"
+                ]
+            }
+        },
+        "ibm_sherbrooke-calibrations-2025041323.csv": {
+            "6": {
+                "physical_qubits": [
+                    100,
+                    101,
+                    110,
+                    69,
+                    70,
+                    74
+                ],
+                "files": [
+                    "ibm_sherbrooke-dynamic-3q-20250413235159.json"
+                ]
+            },
+            "8": {
+                "physical_qubits": [
+                    68,
+                    69,
+                    70,
+                    74,
+                    99,
+                    100,
+                    101,
+                    110
+                ],
+                "files": [
+                    "ibm_sherbrooke-dynamic-4q-20250413235805.json"
+                ]
+            }
+        },
+        "ibm_sherbrooke-calibrations-2025041400.csv": {
+            "18": {
+                "physical_qubits": [
+                    36,
+                    49,
+                    50,
+                    51,
+                    55,
+                    68,
+                    69,
+                    70,
+                    74,
+                    103,
+                    104,
+                    105,
+                    111,
+                    120,
+                    121,
+                    122,
+                    123,
+                    124
+                ],
+                "files": [
+                    "ibm_sherbrooke-dynamic-9q-20250414001557.json"
+                ]
+            },
+            "10": {
+                "physical_qubits": [
+                    55,
+                    68,
+                    69,
+                    70,
+                    74,
+                    36,
+                    48,
+                    49,
+                    50,
+                    51
+                ],
+                "files": [
+                    "ibm_sherbrooke-dynamic-5q-20250414000509.json"
+                ]
+            }
+        },
+        "ibm_sherbrooke-calibrations-2025041416.csv": {
+            "7": {
+                "physical_qubits": [
+                    86,
+                    87,
+                    93,
+                    104,
+                    105,
+                    106,
+                    111
+                ],
+                "files": [
+                    "ibm_sherbrooke-static_sym-7q-20250414162840.json",
+                    "ibm_sherbrooke-static_sym-7q-20250414162853.json",
+                    "ibm_sherbrooke-static_sym-7q-20250414162914.json"
+                ]
+            }
+        }
+    },
+    "ibm_kyiv": {
+        "ibm_kyiv-calibrations-2025030517.csv": {
+            "3": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    43
+                ],
+                "files": [
+                    "ibm_kyiv-static-3q-20250305174710.json"
+                ]
+            }
+        },
+        "ibm_kyiv-calibrations-2025040502.csv": {
+            "5": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    43,
+                    53,
+                    60
+                ],
+                "files": [
+                    "ibm_kyiv-static-5q-20250405030036.json",
+                    "ibm_kyiv-static-5q-20250405031334.json",
+                    "ibm_kyiv-static-5q-20250405031401.json"
+                ]
+            },
+            "4": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    53,
+                    60
+                ],
+                "files": [
+                    "ibm_kyiv-static-4q-20250405030004.json",
+                    "ibm_kyiv-static-4q-20250405031242.json",
+                    "ibm_kyiv-static-4q-20250405031307.json"
+                ]
+            },
+            "3": {
+                "physical_qubits": [
+                    110,
+                    118,
+                    119
+                ],
+                "files": [
+                    "ibm_kyiv-static-3q-20250405025941.json",
+                    "ibm_kyiv-static-3q-20250405031119.json",
+                    "ibm_kyiv-static-3q-20250405031150.json"
+                ]
+            }
+        },
+        "ibm_kyiv-calibrations-2025041201.csv": {
+            "15": {
+                "physical_qubits": [
+                    75,
+                    76,
+                    90,
+                    91,
+                    94,
+                    95,
+                    96,
+                    97,
+                    98,
+                    99,
+                    100,
+                    110,
+                    117,
+                    118,
+                    119
+                ],
+                "files": [
+                    "ibm_kyiv-static_sym-15q-20250412020404.json",
+                    "ibm_kyiv-static_sym-15q-20250412020522.json",
+                    "ibm_kyiv-static_sym-15q-20250412020835.json"
+                ]
+            },
+            "12": {
+                "physical_qubits": [
+                    91,
+                    96,
+                    97,
+                    98,
+                    99,
+                    100,
+                    110,
+                    115,
+                    116,
+                    117,
+                    118,
+                    119
+                ],
+                "files": [
+                    "ibm_kyiv-static_sym-12q-20250412014614.json",
+                    "ibm_kyiv-static_sym-12q-20250412014728.json",
+                    "ibm_kyiv-static_sym-12q-20250412014946.json"
+                ]
+            },
+            "9": {
+                "physical_qubits": [
+                    91,
+                    96,
+                    97,
+                    98,
+                    99,
+                    100,
+                    110,
+                    118,
+                    119
+                ],
+                "files": [
+                    "ibm_kyiv-static_sym-9q-20250412014058.json",
+                    "ibm_kyiv-static_sym-9q-20250412014201.json",
+                    "ibm_kyiv-static_sym-9q-20250412014324.json"
+                ]
+            }
+        },
+        "ibm_kyiv-calibrations-2025041218.csv": {
+            "24": {
+                "physical_qubits": [
+                    81,
+                    82,
+                    83,
+                    84,
+                    85,
+                    91,
+                    92,
+                    97,
+                    98,
+                    99,
+                    100,
+                    101,
+                    102,
+                    103,
+                    104,
+                    105,
+                    106,
+                    110,
+                    111,
+                    117,
+                    118,
+                    119,
+                    120,
+                    122
+                ],
+                "files": [
+                    "ibm_kyiv-static_sym-24q-20250412183411.json",
+                    "ibm_kyiv-static_sym-24q-20250412183645.json",
+                    "ibm_kyiv-static_sym-24q-20250412183729.json"
+                ]
+            }
+        },
+        "ibm_kyiv-calibrations-2025041222.csv": {
+            "4": {
+                "physical_qubits": [
+                    0,
+                    1,
+                    14,
+                    18
+                ],
+                "files": [
+                    "ibm_kyiv-dynamic_param-2q-20250412223943.json"
+                ]
+            }
+        },
+        "ibm_kyiv-calibrations-2025041300.csv": {
+            "6": {
+                "physical_qubits": [
+                    0,
+                    14,
+                    18,
+                    41,
+                    53,
+                    60
+                ],
+                "files": [
+                    "ibm_kyiv-dynamic-3q-20250413003453.json",
+                    "ibm_kyiv-dynamic-3q-20250413004946.json"
+                ]
+            },
+            "8": {
+                "physical_qubits": [
+                    0,
+                    1,
+                    14,
+                    18,
+                    41,
+                    42,
+                    53,
+                    60
+                ],
+                "files": [
+                    "ibm_kyiv-dynamic-4q-20250413003811.json",
+                    "ibm_kyiv-dynamic-4q-20250413004335.json"
+                ]
+            }
+        },
+        "ibm_kyiv-calibrations-2025041323.csv": {
+            "6": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    43,
+                    75,
+                    76,
+                    90
+                ],
+                "files": [
+                    "ibm_kyiv-dynamic-3q-20250413234925.json"
+                ]
+            },
+            "8": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    53,
+                    60,
+                    96,
+                    97,
+                    98,
+                    99
+                ],
+                "files": [
+                    "ibm_kyiv-dynamic-4q-20250413235534.json"
+                ]
+            }
+        },
+        "ibm_kyiv-calibrations-2025041400.csv": {
+            "18": {
+                "physical_qubits": [
+                    91,
+                    96,
+                    97,
+                    98,
+                    99,
+                    100,
+                    110,
+                    118,
+                    119,
+                    33,
+                    39,
+                    40,
+                    41,
+                    42,
+                    43,
+                    53,
+                    59,
+                    60
+                ],
+                "files": [
+                    "ibm_kyiv-dynamic-9q-20250414001005.json"
+                ]
+            },
+            "10": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    43,
+                    53,
+                    60,
+                    96,
+                    97,
+                    98,
+                    99,
+                    100
+                ],
+                "files": [
+                    "ibm_kyiv-dynamic-5q-20250414000118.json"
+                ]
+            }
+        },
+        "ibm_kyiv-calibrations-2025041416.csv": {
+            "7": {
+                "physical_qubits": [
+                    96,
+                    97,
+                    98,
+                    99,
+                    100,
+                    110,
+                    118
+                ],
+                "files": [
+                    "ibm_kyiv-static_sym-7q-20250414161102.json",
+                    "ibm_kyiv-static_sym-7q-20250414161332.json",
+                    "ibm_kyiv-static_sym-7q-20250414161352.json"
+                ]
+            }
+        }
+    },
+    "ibm_brisbane": {
+        "ibm_brisbane-calibrations-2025030520.csv": {
+            "6": {
+                "physical_qubits": [
+                    112,
+                    125,
+                    126,
+                    103,
+                    104,
+                    105
+                ],
+                "files": [
+                    "ibm_brisbane-dynamic-3q-20250305204828.json"
+                ]
+            }
+        },
+        "ibm_brisbane-calibrations-2025040502.csv": {
+            "3": {
+                "physical_qubits": [
+                    31,
+                    32,
+                    36
+                ],
+                "files": [
+                    "ibm_brisbane-static-3q-20250405031504.json",
+                    "ibm_brisbane-static-3q-20250405031524.json"
+                ]
+            },
+            "5": {
+                "physical_qubits": [
+                    4,
+                    5,
+                    6,
+                    7,
+                    15
+                ],
+                "files": [
+                    "ibm_brisbane-static-5q-20250405025314.json",
+                    "ibm_brisbane-static-5q-20250405031729.json",
+                    "ibm_brisbane-static-5q-20250405031758.json",
+                    "ibm_brisbane-static-5q-20250405031956.json"
+                ]
+            },
+            "4": {
+                "physical_qubits": [
+                    30,
+                    31,
+                    32,
+                    36
+                ],
+                "files": [
+                    "ibm_brisbane-static-4q-20250405025239.json",
+                    "ibm_brisbane-static-4q-20250405031604.json",
+                    "ibm_brisbane-static-4q-20250405031701.json",
+                    "ibm_brisbane-static_sym-4q-20250405025130.json"
+                ]
+            }
+        },
+        "ibm_brisbane-calibrations-2025040623.csv": {
+            "3": {
+                "physical_qubits": [
+                    111,
+                    122,
+                    123
+                ],
+                "files": [
+                    "ibm_brisbane-static-3q-20250406235621.json"
+                ]
+            }
+        },
+        "ibm_brisbane-calibrations-2025041200.csv": {
+            "15": {
+                "physical_qubits": [
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    15,
+                    16,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23
+                ],
+                "files": [
+                    "ibm_brisbane-static_sym-15q-20250412020643.json",
+                    "ibm_brisbane-static_sym-15q-20250412021019.json",
+                    "ibm_brisbane-static_sym-15q-20250412021203.json"
+                ]
+            },
+            "24": {
+                "physical_qubits": [
+                    37,
+                    40,
+                    41,
+                    42,
+                    52,
+                    53,
+                    56,
+                    57,
+                    58,
+                    59,
+                    60,
+                    61,
+                    62,
+                    63,
+                    71,
+                    72,
+                    75,
+                    76,
+                    77,
+                    78,
+                    79,
+                    80,
+                    90,
+                    91
+                ],
+                "files": [
+                    "ibm_brisbane-static_sym-24q-20250412184021.json",
+                    "ibm_brisbane-static_sym-24q-20250412185428.json",
+                    "ibm_brisbane-static_sym-24q-20250412195314.json"
+                ]
+            },
+            "9": {
+                "physical_qubits": [
+                    4,
+                    5,
+                    6,
+                    15,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22
+                ],
+                "files": [
+                    "ibm_brisbane-static_sym-9q-20250412002600.json",
+                    "ibm_brisbane-static_sym-9q-20250412002931.json",
+                    "ibm_brisbane-static_sym-9q-20250412003820.json",
+                    "ibm_brisbane-static_sym-9q-20250412004431.json",
+                    "ibm_brisbane-static_sym-9q-20250412010329.json"
+                ]
+            },
+            "4": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    43,
+                    53
+                ],
+                "files": [
+                    "ibm_brisbane-dynamic_param-2q-20250412211831.json",
+                    "ibm_brisbane-dynamic_param-2q-20250412213722.json",
+                    "ibm_brisbane-dynamic_param-2q-20250412221453.json"
+                ]
+            },
+            "12": {
+                "physical_qubits": [
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    15,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    23
+                ],
+                "files": [
+                    "ibm_brisbane-static_sym-12q-20250412015236.json",
+                    "ibm_brisbane-static_sym-12q-20250412015352.json",
+                    "ibm_brisbane-static_sym-12q-20250412015623.json"
+                ]
+            }
+        },
+        "ibm_brisbane-calibrations-2025041323.csv": {
+            "6": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    53,
+                    63,
+                    64,
+                    65
+                ],
+                "files": [
+                    "ibm_brisbane-dynamic-3q-20250413235317.json"
+                ]
+            },
+            "8": {
+                "physical_qubits": [
+                    41,
+                    42,
+                    43,
+                    53,
+                    4,
+                    5,
+                    6,
+                    15
+                ],
+                "files": [
+                    "ibm_brisbane-dynamic-4q-20250413235909.json"
+                ]
+            }
+        },
+        "ibm_brisbane-calibrations-2025041400.csv": {
+            "18": {
+                "physical_qubits": [
+                    4,
+                    5,
+                    6,
+                    15,
+                    18,
+                    19,
+                    20,
+                    21,
+                    22,
+                    37,
+                    38,
+                    39,
+                    40,
+                    41,
+                    42,
+                    43,
+                    52,
+                    53
+                ],
+                "files": [
+                    "ibm_brisbane-dynamic-9q-20250414004339.json"
+                ]
+            },
+            "10": {
+                "physical_qubits": [
+                    4,
+                    5,
+                    6,
+                    15,
+                    22,
+                    40,
+                    41,
+                    42,
+                    43,
+                    53
+                ],
+                "files": [
+                    "ibm_brisbane-dynamic-5q-20250414000647.json"
+                ]
+            }
+        },
+        "ibm_brisbane-calibrations-2025041416.csv": {
+            "7": {
+                "physical_qubits": [
+                    37,
+                    38,
+                    52,
+                    56,
+                    57,
+                    58,
+                    71
+                ],
+                "files": [
+                    "ibm_brisbane-static_sym-7q-20250414163100.json",
+                    "ibm_brisbane-static_sym-7q-20250414163115.json",
+                    "ibm_brisbane-static_sym-7q-20250414163123.json"
+                ]
+            }
+        }
+    }
+}
