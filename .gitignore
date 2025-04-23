@@ -1,6 +1,4 @@
-mermin_benchmarking/__pycache__/
-mermin_benchmarking/.ipynb_checkpoints/
+**/__pycache__/
 *.pyc
 **/.ipynb_checkpoints/
-update_1-0.ipynb
 local/
