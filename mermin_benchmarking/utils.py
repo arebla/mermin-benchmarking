@@ -351,7 +351,11 @@ def refresh_backend_from_csv(self, calibrations_csv: str):
             for node in self._props_dict['qubits'][index]:
                 for prop_index, prop_name in enumerate(prop_names):
                     if node['name'] == prop_name:
-                        node['value'] = float(row[prop_index + 1])
+                        value = row[prop_index + 1]
+                        if value.strip() != '':
+                            node['value'] = float(value)
+                        else:
+                            node['value'] = 0.0
  
             # Single-qubit gate errors
             for node in self._props_dict['gates']:
