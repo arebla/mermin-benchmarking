@@ -101,23 +101,30 @@ def draw_circuits(circuits: Union[QuantumCircuit, List[QuantumCircuit]], terms: 
     plt.show()
 
 
-def load_files(directory: str):
+def load_mermin_values(directory: str, index_path: Optional[str] = None):
     """
     Given a directory with files named in the format "backend-experiment_type-num_qubits-timestamp.json", 
     returns a nested dictionary of Mermin values organized by backend, experiment type, and number of qubits.
 
     Args:
         directory (str): Path of the folder where the .json files are stored.
-        
+        index_path (str): Path to the index file.
     Returns:
         collections.defaultdict: Dictionary with the Mermin values by backend, experiment and number of qubits.
     """
     
     data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-
+    if index_path:
+        with open(index_path, "r") as file:
+            index = json.load(file)
+    else:
+        index = None
+    
     for file_name in os.listdir(directory):
-        if file_name.endswith(('.json')):  
+        if file_name.endswith(('.json')):
             parts = file_name.split('-')
+            if len(parts) < 4:
+                continue
             backend_name = parts[0]
             experiment_type = parts[1]
             num_qubits = parts[2]
@@ -132,24 +139,62 @@ def load_files(directory: str):
                     continue # It takes too long ^_^
                     
                 if experiment_type == 'static':
-                    value = counts2staticvalue(result)
+                    if index:
+                        mitigation_matrix = fetch_mitigation_matrix(index, file_name)
+                        value = counts2staticvalue(result, readout_matrix=mitigation_matrix)
+                    else:
+                        value = counts2staticvalue(result)
                     data[backend_name][experiment_type][num_qubits].append(value)
                     
                 elif experiment_type == 'static_sym':
-                    value = counts2staticvalue(result, symmetries=True)
+                    if num_qubits in ['4q', '7q'] and index:
+                        mitigation_matrix = fetch_mitigation_matrix(index, file_name)
+                        value = counts2staticvalue(result, symmetries=True, readout_matrix=mitigation_matrix)
+                    else:
+                        value = counts2staticvalue(result, symmetries=True)
                     data[backend_name][experiment_type][num_qubits].append(value)
                     
                 elif experiment_type == 'dynamic':
                     if len(result) == 1:
-                        value = counts2dynamicvalue(result)
+                        if num_qubits in ['3q'] and index:
+                            mitigation_matrix = fetch_mitigation_matrix(index, file_name)
+                            value = counts2dynamicvalue(result, readout_matrix=mitigation_matrix)
+                        else:
+                            value = counts2dynamicvalue(result)
                         data[backend_name][experiment_type][num_qubits].append(value)
                     else:
                         for res in result:
-                            value = counts2dynamicvalue([res])
+                            if num_qubits in ['3q'] and index:
+                                mitigation_matrix = fetch_mitigation_matrix(index, file_name)
+                                value = counts2dynamicvalue(result, readout_matrix=mitigation_matrix)
+                            else:
+                                value = counts2dynamicvalue([res])
                             data[backend_name][experiment_type][num_qubits].append(value)
 
     return data
 
+def fetch_mitigation_matrix(index, file_name):
+    """
+    Given the dictionary of data, a backend, and a specific file name,
+    extracts the mitigation matrix from the corresponding calibration file.
+
+    Args:
+        index (dict): The dictionary containing the data.
+        file_name (str): The name of the file (e.g., 'ibm_sherbrooke-static-4q-20250405030228.json').
+
+    Returns:
+        list: The mitigation matrix if found, or None if not found.
+    """
+    parts = file_name.split('-')
+    backend_name = parts[0]
+    if backend_name in index:
+        for calibration_file, nested_dict in index[backend_name].items():
+            for subkey, calibration_data in nested_dict.items():
+                if file_name in calibration_data['files']:
+                    return np.array(calibration_data['mitigation_matrix'])
+
+    return None
+    
 
 def generate_job_files(job_id: str, service: QiskitRuntimeService):
     """

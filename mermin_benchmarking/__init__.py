@@ -38,7 +38,8 @@ from .benchmarking import (
 from .utils import (
     draw_circuits,
     matrix_representation,
-    load_files,
+    load_mermin_values,
+    fetch_mitigation_matrix,
     generate_job_files,
     save_calibration_to_csv,
     refresh_backend_from_csv,
