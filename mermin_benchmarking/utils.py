@@ -166,16 +166,22 @@ def load_mermin_values(directory: str, index_path: Optional[str] = None):
                         for res in result:
                             if num_qubits in ['3q'] and index:
                                 mitigation_matrix = fetch_mitigation_matrix(index, file_name)
-                                value = counts2dynamicvalue(result, readout_matrix=mitigation_matrix)
+                                value = counts2dynamicvalue([res], readout_matrix=mitigation_matrix)
                             else:
                                 value = counts2dynamicvalue([res])
                             data[backend_name][experiment_type][num_qubits].append(value)
 
+    def defaultdict2dict(d):
+        if isinstance(d, defaultdict):
+            d = {j: defaultdict2dict(k) for j, k in d.items()}
+        return d
+    data = defaultdict2dict(data)
     return data
+
 
 def fetch_mitigation_matrix(index, file_name):
     """
-    Given the dictionary of data, a backend, and a specific file name,
+    Given a dictionary of data and a specific file name,
     extracts the mitigation matrix from the corresponding calibration file.
 
     Args:
@@ -221,6 +227,7 @@ def generate_job_files(job_id: str, service: QiskitRuntimeService):
         job_mode = 'static_sym'
     else:
         job_mode = 'dynamic'
+        num_qubits /= 2
     
     file_name = (
         f"./data/{job.backend().name}-"
@@ -261,6 +268,7 @@ def generate_job_files(job_id: str, service: QiskitRuntimeService):
     with open(file_name_details, 'w') as f:
         for line in job_details:
             f.write(line + '\n')
+    print(f"Data successfully saved to {job_mode}-{num_qubits}q-{job.creation_date.strftime('%Y%m%d%H%M%S')}")
 
 
 # Save calibration data from IBM Quantum devices
@@ -275,6 +283,23 @@ def save_calibration_to_csv(backend: IBMBackend, date: datetime):
 
     Returns:
         None: Writes a .CSV file to the "./data/backend_calibrations/" directory.
+
+    Usage:
+    ```
+    from qiskit_ibm_runtime import QiskitRuntimeService
+    from datetime import datetime
+
+    service = QiskitRuntimeService(
+        channel='ibm_quantum',
+        instance='ibm-q/open/main',
+        token='# Insert token here',
+    )
+
+    backend = service.backend("ibm_sherbrooke")
+    date = datetime(day=14, month=3, year=2025, hour=16)
+
+    save_calibration_to_csv(backend, date)
+    ```
 
     Notes: 
         - This function is hardcoded to work with 'Eagle r3' processor types.
@@ -384,7 +409,6 @@ def refresh_backend_from_csv(self, calibrations_csv: str):
     # Change calibration date if needed
     #self._props_dict['last_update_date'] = datetime.utcnow().isoformat() + 'Z'
     
-    import csv
     with open(calibrations_csv) as csvfile:
         reader = csv.reader(csvfile)
         for idx, row in enumerate(reader):
